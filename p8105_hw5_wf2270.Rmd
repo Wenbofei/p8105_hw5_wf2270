@@ -13,7 +13,7 @@ library(patchwork)
 
 #Problem 1
 Read in the data.
-```{r P1}
+```{r P1, message=F}
 homicide_df = 
   read_csv("data/homicide-data.csv") %>% 
   mutate(
@@ -70,5 +70,46 @@ results_df %>%
 ```
 
 # Problem 2
+Read and Clean the data
+```{r read_n_clean, message=F}
+files = list.files("data/data_2", pattern = "*.csv") # get the file name
+# View(files)
+
+data = files %>%                             
+  map(~ read_csv(file.path("data/data_2", .)))  %>%  
+  reduce(rbind)        # read data                       
+# View(data)
+
+# getting the arm and id 
+participant = separate(data.frame(files), col=files, sep = "([._])", into =c("arm", "id")) 
+
+participants_df = tibble(participant, data ) %>% 
+  pivot_longer(                                  
+    cols = week_1:week_8,
+    names_prefix = "week_",
+    names_to = "week",
+    values_to = "value"
+  )
+# View(participants_df) 
+```
+
+Spagetti Plot: each line represents a participant
+  
+```{r 2a}
+participants_df %>%
+  mutate(
+    unique = str_c(arm , id, sep="_") 
+  ) %>%
+  ggplot( aes(x = week, y = value, group = unique)) + 
+  geom_line(aes(color=arm)) + 
+  labs(
+    title = "Spaghetti Plot"
+  )
+```
+
+Control groups always stays in a relatively low value with no obvious increasing or decreasing trend, while experiment group starts with similar values to control group but has obvious overall increasing trend.
+
+# Problem 3
+
 
 
