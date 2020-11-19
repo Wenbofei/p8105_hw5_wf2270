@@ -148,9 +148,9 @@ sim_results %>%
     reject_status = ifelse(p.value > alpha, 0, 1) 
   ) %>% 
   group_by(mu) %>% 
-  mutate( 
+  summarize( 
     prop = mean(reject_status)) %>% # calculate proportion
-  ggplot(aes(x = mu, y = prop/5000)) + 
+  ggplot(aes(x = mu, y = prop)) + 
   geom_col(aes(fill=mu)) +
   geom_hline(yintercept=0.05, linetype="dashed", size=0.1) +
   geom_text(aes(label=round(prop, 2), y = prop + 0.05)) + 
@@ -158,5 +158,27 @@ sim_results %>%
     title = "Rejection Proportion v.s. mu",
     y = "Proportion of Tests Rejected"
   )
+```
+
+Only if mu=0, will the proportion of rejected test is close to 0.05, this is consistent with our null hypothesis that mu_0=0.
+
+Plot of estimated mu v.s true mu
+```{r}
+mean_values = sim_results %>% 
+  mutate(
+    mu = as.factor(mu),
+  ) %>% 
+  group_by(mu) %>% 
+  summarize(mean_est = mean(estimate)) %>% 
+  ggplot(aes(x = mu, y = mean_est)) + 
+  geom_point(aes(color=mu)) +
+  geom_text(aes(label=round(mean_est, 2), y = mean_est+0.3)) + 
+  labs(
+    title = "Mean of Estimates v.s Mu",
+    y = "Mean of Estimates",
+    x = "True Mu"
+  ) 
+
+
 ```
 
